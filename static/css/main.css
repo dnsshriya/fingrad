@@ -1,53 +1,21 @@
-/* body, html {
-    margin: 0;
-    font-family: sans-serif;
-    background-color: lightblue;
-}
-
-.content {
-    margin: 0 auto;
-    width: 400px;
-}
-
-table, td, th {
-    border: 1px solid #aaa;
-}
-
-table {
-    border-collapse: collapse;
-    width: 100%;
-}
-
-th {
-    height: 30px;
-}
-
-td {
-    text-align: center;
-    padding: 5px;
-}
-
-.form {
-    margin-top: 20px;
-}
-
-#content {
-    width: 70%;
-} */
-
+/* General body and html styling */
 body, html {
     margin: 0;
-    font-family: sans-serif;
-    background-color: rgb(105, 112, 97); /* Changed background color */
+    font-family: 'Roboto', sans-serif; /* Updated font */
+    background-color: rgb(238, 238, 238); /* Lighter background */
+    text-align: center;
 }
 
+/* Main content container */
 .content {
     margin: 0 auto;
     width: 400px;
 }
 
+/* Table styles */
 table, td, th {
-    border: 1px solid #aaa;
+    border-width: 0px;
+    border-bottom: 1px solid #ccc; /* Softer border */
 }
 
 table {
@@ -57,17 +25,116 @@ table {
 
 th {
     height: 30px;
+    font-weight: bold;
+    background-color: #007BFF; /* Blue header */
+    color: #fff;
 }
 
 td {
     text-align: center;
     padding: 5px;
+    color: #333; /* Darker text */
 }
 
+/* Form styling */
 .form {
     margin-top: 20px;
 }
 
 #content {
     width: 70%;
+}
+
+body .form-container {
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    align-items: center;
+    width: 100%;
+    height: auto;
+    background-color: rgb(250, 250, 250); /* Subtle background */
+    padding-bottom: 50px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Added shadow for depth */
+}
+
+/* Input and select elements */
+input {
+    width: 200px;
+    height: 21px;
+    font-family: 'Roboto', sans-serif; /* Matching font */
+}
+
+select {
+    width: 195px;
+    height: 27px;
+    font-family: 'Roboto', sans-serif; /* Matching font */
+}
+
+/* Submit button */
+input[type="submit"] {
+    background-color: #007BFF; /* Blue button */
+    color: white;
+    width: 220px;
+    border-radius: 7px;
+    height: 36px;
+    cursor: pointer;
+    font-family: 'Roboto', sans-serif;
+    font-weight: bold;
+    border: none;
+}
+
+input[type="submit"]:hover {
+    background-color: #0056b3; /* Darker blue hover */
+}
+
+/* Table style enhancements */
+.table_style th {
+    background-color: #343A40; /* Dark gray header */
+    height: 40px;
+    color: #FFF;
+}
+
+.table_style {
+    width: 90%;
+    margin: auto; /* Centered table */
+}
+
+.table_style tr:hover {
+    background-color: #F1F1F1; /* Lighter hover effect */
+    color: #333; /* Dark text on hover */
+}
+
+/* Buttons */
+.btn {
+    padding: 10px 20px;
+    background-color: #343A40; /* Dark button */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    font-family: 'Roboto', sans-serif;
+    font-weight: bold;
+}
+
+.btn:hover {
+    background-color: #495057; /* Slightly lighter gray */
+}
+
+/* Delete button */
+#del {
+    background-color: #FF5C5C; /* Red button */
+    color: white;
+    width: 75px;
+    border-radius: 7px;
+    height: 30px;
+    cursor: pointer;
+    font-family: 'Roboto', sans-serif;
+    font-weight: bold;
+    border: none;
+}
+
+#del:hover {
+    background-color: #FF2D2D; /* Darker red hover */
 }
