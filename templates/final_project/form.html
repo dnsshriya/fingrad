@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Shopping Cart</title>
+{% endblock %}
+
+{% block body %}
+<div class="form-container">
+    <h1>CLOTH STORE INEVENTORY</h1>
+    <h3>INFORMATION OF THE PRODUCT</h3>
+    <form action="/final_project" method="POST" enctype="multipart/form-data">
+        <label for="PN">Product Name:</label><br/>
+        <input type="text" name="pName" id="pName" required><br><br> 
+
+        <label for="Project-type">Product Type:</label><br/>
+        <select id="product-type" name="product_type" required>
+            <option value="">Select Product type</option>
+            <option value="Electronics">Mens wear</option>
+            <option value="Groceries">Womens Wear</option>
+            <option value="Clothes">Kids Wear</option>
+        </select>
+        <br><br> 
+
+        <label for="priority"> Size(S/M/L/XL)</label><br/>
+        <input type="number" name="pr" id="pr" min="1" max="10" required><br><br> 
+
+        <label for="due-date">Purchased Date:</label><br/>
+        <input type="date" id="due-date" name="due_date" required><br><br>
+
+        <label for="file-upload">Upload image or file (Optional):</label><br/>
+        <input type="file" id="file-upload" name="file_upload"><br><br>
+
+        <input type="submit" value="Add Product" id="sub">
+    </form>
+
+    <h1>Existing Products</h1>
+    <form method="GET" action="/final_project" style="margin-bottom: 20px;">
+        <label for="search-query">Search Product:</label>
+        <input type="text" id="search-query" name="search_query" placeholder="Enter product name or type" style="margin-right: 10px;">
+        <button type="submit">Search</button>
+    </form>
+
+    {% if projects|length < 1 %}
+        {% if search_query %}
+            <h4 style="text-align: center; color: red;">No items found for your search: "{{ search_query }}"</h4>
+        {% else %}
+            <h4 style="text-align: center;">There are no Products found. Add a New Product!</h4>
+        {% endif %}
+    {% else %}
+        <table class="table_style">
+            <tr>
+                <th><a href="?sort_column=task">Product Name</a></th>
+                <th><a href="?sort_column=due_date">Purchased Date</a></th>
+                <th>Category</th>
+                <th>Product Quality (1-10)</th>
+                <th>Image or file</th>
+                <th>Actions</th>
+            </tr>
+            {% for project in projects %}
+            <tr>
+                <td>{{ project.task }}</td>
+                <td>{{ project.due_date }}</td>
+                <td>{{ project.category }}</td>
+                <td>{{ project.priority }}</td>
+                <td>
+                    <a href="{{ url_for('static', filename='uploads/' + project.file_name) }}">
+                        <img src="{{ url_for('static', filename='uploads/' + project.file_name) }}" 
+                             alt="{{ project.file_name }}" 
+                             style="max-width: 50px; max-height: 50px;">
+                    </a>
+                </td>
+                <td>
+                    <a href="/update_form/{{ project.id }}">Update</a><br>
+                    <a href="/delete_form/{{ project.id }}">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+    <div style="text-align: right; margin-top:20px;">
+        <a href="/" style="text-decoration: none;">
+            <button class="btn">Back to Home</button>
+          </a>
+    </div>
+</div>
+{% endblock %}

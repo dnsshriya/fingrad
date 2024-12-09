@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Employee updates</title>
+{% endblock %}
+
+{% block body %}
+<div class="form-container">
+    <h1 style="text-align: center">Update Employee Details</h1>
+
+    <div class="form">
+        <form action="/update_form/{{project.id}}" method="POST" enctype="multipart/form-data">
+
+        
+        <label for="pName">Product Name:</label><br/>
+        <input type="text" name="pName" id="pName" value="{{ project.task }}" required><br/><br/>
+
+        <label for="product-type">Product Type:</label><br/>
+        <select id="product-type" name="product_type" required>
+            <option value="Electronics" {% if project.category == 'Electronics' %}selected{% endif %}>Electronics</option>
+            <option value="Groceries" {% if project.category == 'Groceries' %}selected{% endif %}>Groceries</option>
+            <option value="Clothes" {% if project.category == 'Clothes' %}selected{% endif %}>Clothes</option>
+        </select>
+        <br/><br/>
+
+        <label for="pr">Size(S/M/L/XL):</label><br/>
+        <input type="number" name="pr" id="pr" min="1" max="10" value="{{ project.priority }}" required><br/><br/>
+
+        <label for="due-date">Purchased Date:</label><br/>
+        <input type="date" id="due-date" name="due_date" value="{{ project.due_date }}" required><br/><br/>
+
+        
+        <!-- Current File Display -->
+       
+
+        <!-- File Upload -->
+        <label for="file-upload">Upload image or file (
+            Optional):</label><br/>
+        <input type="file" id="file-upload" name="file_upload"><br/><br/>
+
+        <button class="btn" type="submit">Update Product Details</button>
+        </form>
+    </div>
+    <div style="text-align: left; margin-top:20px;">
+        <a href="/final_project"><button class="btn">Cancel</button></a>
+  </div>
+</div>
+
+
+{% endblock %}
