@@ -1,191 +1,108 @@
-from flask import Flask, render_template, url_for, request, redirect
-from models import db, Todo, Project
-import os
-from datetime import datetime
-from sqlalchemy import or_
-from flask import current_app
-from sqlalchemy import asc
+# from flask import Flask, render_template, url_for, request, redirect
+# from flask_sqlalchemy import SQLAlchemy
+# from datetime import datetime
 
+# app = Flask(__name__)
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
+# db = SQLAlchemy(app)
+
+# class Todo(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     content = db.Column(db.String(200), nullable=False)
+#     date_created = db.Column(db.DateTime, default=datetime.utcnow)
+
+#     def __repr__(self):
+#         return '<Task %r>' % self.id
+
+
+# @app.route('/', methods=['POST', 'GET'])
+# def index():
+#     if request.method == 'POST':
+#         task_content = request.form['content']
+#         new_task = Todo(content=task_content)
+
+#         try:
+#             db.session.add(new_task)
+#             db.session.commit()
+#             return redirect('/')
+#         except:
+#             return 'There was an issue adding your task'
+
+#     else:
+#         tasks = Todo.query.order_by(Todo.date_created).all()
+#         return render_template('index.html', tasks=tasks)
+
+
+# @app.route('/delete/<int:id>')
+# def delete(id):
+#     task_to_delete = Todo.query.get_or_404(id)
+
+#     try:
+#         db.session.delete(task_to_delete)
+#         db.session.commit()
+#         return redirect('/')
+#     except:
+#         return 'There was a problem deleting that task'
+
+# @app.route('/update/<int:id>', methods=['GET', 'POST'])
+# def update(id):
+#     task = Todo.query.get_or_404(id)
+
+#     if request.method == 'POST':
+#         task.content = request.form['content']
+
+#         try:
+#             db.session.commit()
+#             return redirect('/')
+#         except:
+#             return 'There was an issue updating your task'
+
+#     else:
+#         return render_template('update.html', task=task)
+
+
+# if __name__ == "__main__":
+#     app.run(debug=True)
+
+
+from flask import Flask, render_template, request, redirect, url_for
+from datetime import datetime
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
-db.init_app(app)
+
+# Sample in-memory task list
+tasks = []
 
 @app.route('/')
-def home():
+def landing_page():
     return render_template('landing.html')
 
-@app.route('/assignment', methods=['POST', 'GET'])
-def index():
+@app.route('/assignment', methods=['GET'])
+def assignment_page():
+    return render_template('assignment/index.html', tasks=tasks)
+
+@app.route('/assignment', methods=['POST'])
+def add_task():
+    task_content = request.form.get('content')
+    if task_content:
+        tasks.append({'id': len(tasks) + 1, 'content': task_content, 'date_created': datetime.now()})
+    return redirect(url_for('assignment_page'))
+
+@app.route('/assignment/delete/<int:task_id>')
+def delete_task(task_id):
+    global tasks
+    tasks = [task for task in tasks if task['id'] != task_id]
+    return redirect(url_for('assignment_page'))
+
+@app.route('/assignment/update/<int:task_id>', methods=['GET', 'POST'])
+def update_task(task_id):
+    task = next((task for task in tasks if task['id'] == task_id), None)
     if request.method == 'POST':
-        task_content = request.form['content']
-        new_task = Todo(content=task_content)
+        task_content = request.form.get('content')
+        if task_content:
+            task['content'] = task_content
+        return redirect(url_for('assignment_page'))
+    return render_template('assignment/update.html', task=task)
 
-        try:
-            db.session.add(new_task)
-            db.session.commit()
-            return redirect('/assignment')
-        except:
-            return 'There was an issue adding your task'
-
-    else:
-        tasks = Todo.query.order_by(Todo.date_created).all()
-        return render_template('/assignment/index.html', tasks=tasks)
-
-
-
-@app.route('/final_project', methods=['POST', 'GET'])
-def form():
-    if request.method == 'POST':
-        try:
-            # Get form data
-            task = request.form['pName']
-            category = request.form['product_type']
-            priority = int(request.form['pr'])
-            due_date_str = request.form['due_date']
-            file = request.files['file_upload']
-            
-
-            # Convert due_date_str to datetime.date
-            due_date = datetime.strptime(due_date_str, '%Y-%m-%d').date()
-
-            # Ensure UPLOAD_FOLDER is defined
-           
-            
-            file = request.files.get('file_upload')  # Use .get() to avoid KeyError
-            # Get the file from the form
-
-            if file and file.filename:
-             UPLOAD_FOLDER = os.path.join(current_app.root_path, 'static', 'uploads')
-             app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-             file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
-             file.save(file_path)  # Check if a file is uploaded and has a valid filename
-            else:
-                file_path = None
-             
-    
-
-            # Create a new project instance
-            new_project = Project(
-                task=task,
-                category=category,
-                priority=priority,
-                due_date=due_date,
-                file_name=file.filename,
-            )
-
-            # Save to the database
-            db.session.add(new_project)
-            db.session.commit()
-
-            return redirect('/final_project')
-
-        except Exception as e:
-            return f'There was an issue adding your project: {e}'
-
-    else:
-        search_query = request.args.get('search_query', '').strip()
-        sort_column = request.args.get('sort_column', 'task')
-        # Fetch all projects to display
-        sort_column = request.args.get('sort_column', 'task') 
-
-        # Valid columns for sorting
-        valid_columns = ['task', 'due_date']
-
-        # Ensure sort_column is a valid column
-        if sort_column not in valid_columns:
-            sort_column = 'task'  # Default to 'priority' if invalid sort_column is provided
-
-        # Build dynamic sort query (ascending only)
-        sort_query = asc(getattr(Project, sort_column))
-        # Filter projects based on search query
-        if search_query:
-            # Filter projects by search query
-            projects = Project.query.filter(
-                or_(
-                    Project.task.ilike(f'%{search_query}%'),
-                    Project.category.ilike(f'%{search_query}%')
-                )
-            ).order_by(sort_query).all()
-        else:
-            # Fetch all projects if no search query
-             projects = Project.query.order_by(sort_query).all()
-
-        return render_template('/final_project/Form.html', 
-                               projects=projects, 
-                               search_query=search_query)
-
-
-@app.route('/delete/<int:id>')
-def delete(id):
-    task_to_delete = Todo.query.get_or_404(id)
-
-    try:
-        db.session.delete(task_to_delete)
-        db.session.commit()
-        return redirect('/assignment')
-    except:
-        return 'There was a problem deleting that task'
-    
-@app.route('/delete_form/<int:id>')
-def delete_project(id):
-    project = Project.query.get_or_404(id)
-    db.session.delete(project)
-    db.session.commit()
-    return redirect('/final_project')  # Redirect back to the project list
-
-@app.route('/update/<int:id>', methods=['GET', 'POST'])
-def update(id):
-    task = Todo.query.get_or_404(id)
-
-    if request.method == 'POST':
-        task.content = request.form['content']
-
-        try:
-            db.session.commit()
-            return redirect('/assignment')
-        except:
-            return 'There was an issue updating your task'
-
-    else:
-        return render_template('/assignment/update.html', task=task)
-    
-
-@app.route('/update_form/<int:id>', methods=['GET', 'POST'])
-def Formupdate(id):
-    project = Project.query.get_or_404(id)
-
-    if request.method == 'POST':
-        # Update fields from the form
-        project.task = request.form['pName']
-        project.category = request.form['product_type']
-        project.priority = int(request.form['pr'])
-        project.due_date = datetime.strptime(request.form['due_date'], '%Y-%m-%d').date()
-
-        # Handle file upload
-        file = request.files.get('file_upload')  # Use .get() to avoid KeyError
-        if file and file.filename:  # Check if a file was uploaded
-            # Define the upload folder (relative to the Flask app's static folder)
-            UPLOAD_FOLDER = os.path.join(current_app.root_path, 'static', 'uploads')
-            os.makedirs(UPLOAD_FOLDER, exist_ok=True)  # Ensure the folder exists
-
-            # Save the file to the upload folder
-            file_path = os.path.join(UPLOAD_FOLDER, file.filename)
-            file.save(file_path)
-
-            # Update the file name in the database
-            project.file_name = file.filename
-
-        try:
-            # Commit changes to the database
-            db.session.commit()
-            return redirect('/final_project')
-        except Exception as e:
-            return f"There was an issue updating your project: {e}"
-
-    return render_template('/final_project/Form_update.html', project=project)
-
-if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
-    app.run(debug=True)
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0')
